@@ -51,7 +51,6 @@ jobs:
       - name: Accept Android licenses
         run: |
           yes | flutter doctor --android-licenses || true
-          flutter doctor -v
 
       - name: Show environment
         run: |
@@ -59,8 +58,9 @@ jobs:
           pip --version
           java -version
           flutter --version
+          flutter doctor -v
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
@@ -70,8 +70,15 @@ jobs:
         env:
           PYTHONUNBUFFERED: "1"
         run: |
-          set -e
-          flet build apk --verbose --yes
+          set -euxo pipefail
+          flet build apk --verbose --yes 2>&1 | tee build.log
+
+      - name: Show log tail
+        run: |
+          tail -n 200 build.log || true
+
+      - name: Find APK
+        run: |
           find . -name "*.apk" -type f | sort
 
       - name: Upload APK artifact
@@ -80,5 +87,6 @@ jobs:
           name: flet-apk
           path: |
             **/*.apk
+            build.log
           if-no-files-found: error
           retention-days: 14
