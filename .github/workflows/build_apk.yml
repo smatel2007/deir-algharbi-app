@@ -43,7 +43,7 @@ jobs:
       - name: Enable Android
         run: flutter config --enable-android
 
-      - name: Show tool versions
+      - name: Show environment
         run: |
           python --version
           pip --version
@@ -57,13 +57,14 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install --upgrade flet supabase
 
-      - name: Build APK with Flet
+      - name: Build APK
         env:
           PYTHONUNBUFFERED: "1"
         run: |
-          set -e
           flet build apk --verbose --yes
-          echo "APK files found:"
+
+      - name: Find APK
+        run: |
           find . -name "*.apk" -type f | sort
 
       - name: Upload APK artifact
