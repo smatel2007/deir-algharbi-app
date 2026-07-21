@@ -40,11 +40,7 @@ jobs:
       env:
         PYTHONUNBUFFERED: "1"
       run: |
-        python3 -c "
-        import subprocess
-        process = subprocess.Popen(['flet', 'build', 'apk'], stdin=subprocess.PIPE, text=True)
-        process.communicate(input='y\ny\ny\ny\n')
-        "
+        flet build apk --project-name "deir_gharbey_app"
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
@@ -53,3 +49,4 @@ jobs:
         path: |
           build/apk/*.apk
           build/app/outputs/flutter-apk/*.apk
+          dist/*.apk
