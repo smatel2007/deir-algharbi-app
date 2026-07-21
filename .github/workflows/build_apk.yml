@@ -8,7 +8,7 @@ on:
 env:
   PYTHON_VERSION: "3.11"
   JAVA_VERSION: "17"
-  FLUTTER_VERSION: "3.22.3"
+  FLUTTER_VERSION: "3.44.4"
 
 jobs:
   build:
@@ -33,6 +33,11 @@ jobs:
           distribution: temurin
           java-version: ${{ env.JAVA_VERSION }}
 
+      - name: Install Linux packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev pkg-config clang cmake ninja-build
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -43,28 +48,30 @@ jobs:
       - name: Enable Android
         run: flutter config --enable-android
 
+      - name: Accept Android licenses
+        run: |
+          yes | flutter doctor --android-licenses || true
+          flutter doctor -v
+
       - name: Show environment
         run: |
           python --version
           pip --version
           java -version
           flutter --version
-          flutter doctor -v
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install --upgrade flet supabase
 
-      - name: Build APK
+      - name: Build APK with Flet
         env:
           PYTHONUNBUFFERED: "1"
         run: |
+          set -e
           flet build apk --verbose --yes
-
-      - name: Find APK
-        run: |
           find . -name "*.apk" -type f | sort
 
       - name: Upload APK artifact
