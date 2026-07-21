@@ -46,12 +46,14 @@ jobs:
         process.communicate(input='y\ny\ny\ny\n')
         "
 
+    - name: Find and List APK files for debugging
+      run: |
+        echo "Searching for APK files in the workspace:"
+        find . -name "*.apk"
+
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-release-apk
         path: |
-          build/apk/*.apk
-          build/app/outputs/flutter-apk/*.apk
-          dist/*.apk
-          **/output/*.apk
+          **/*.apk
