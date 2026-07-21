@@ -43,21 +43,22 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install flet supabase
 
-    - name: Initialize Flet Project Structure
+    - name: Build Android APK using Flet CLI
+      env:
+        PYTHONUNBUFFERED: "1"
       run: |
-        # هذا الأمر يقوم بتهيئة ملفات الـ Flutter الخاصة بـ Flet لمرة واحدة صامتة بدون أخطاء
-        flet pack main.py --dry-run || true
-
-    - name: Build APK directly via Flutter
-      run: |
-        # الانتقال لمجلد البناء الداخلي لفلاتر وبناء الـ APK مباشرة لتجنب تكرار الـ doctor
-        if [ -d "build" ]; then cd build; fi
-        flutter build apk --release
+        python3 -c "
+        import subprocess
+        process = subprocess.Popen(['flet', 'build', 'apk', '--verbose'], stdin=subprocess.PIPE, text=True)
+        process.communicate(input='y\ny\ny\ny\n')
+        "
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-release-apk
         path: |
+          build/apk/*.apk
           build/app/outputs/flutter-apk/*.apk
-          **/app-release.apk
+          build/app/outputs/apk/release/*.apk
+          **/*.apk
