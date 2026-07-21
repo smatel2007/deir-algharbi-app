@@ -37,8 +37,14 @@ jobs:
         pip install flet supabase
 
     - name: Build Android APK
+      env:
+        PYTHONUNBUFFERED: "1"
       run: |
-        yes | flet build apk
+        python3 -c "
+        import subprocess
+        process = subprocess.Popen(['flet', 'build', 'apk'], stdin=subprocess.PIPE, text=True)
+        process.communicate(input='y\ny\ny\ny\n')
+        "
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
