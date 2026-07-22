@@ -1,0 +1,8 @@
+[project]
+name = "deir_garbi_app"
+version = "1.0.0"
+description = "تطبيق خدمات الدير الغربي"
+dependencies = [
+    "flet",
+    "supabase"
+]
